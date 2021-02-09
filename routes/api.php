@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,4 +29,5 @@ Route::post('/reset', [AuthController::class, 'resetPassword']);
 Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::get('/renew', [AuthController::class, 'renew']);
+    Route::get('/users', [UserController::class, 'index']);
 });
