@@ -35,49 +35,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -86,7 +43,35 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user_updated = User::where('id', $id)->first();
+        if(!$user_updated){
+            return response()->json([
+                'status' => 400,
+                'ok' => false,
+                'msg' => 'User no found'
+            ]);
+        }
+
+        $user_updated->name = $request->name;
+        $user_updated->lastname = $request->lastname;
+        $user_updated->email = $request->email;
+
+        if(!$user_updated->save()){
+            return response()->json([
+                'status' => 400,
+                'ok' => false,
+                'msg' => 'Something was wrong, please contact with admin'
+            ]);
+        }
+
+        $users = User::orderBy('name', 'Asc')->get();
+        return response()->json([
+            'status' => 200,
+            'ok' => true,
+            'msg' => 'User updated successfully',
+            'user_updated' => $user_updated,
+            'users' => $users
+        ]);
     }
 
     /**

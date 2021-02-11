@@ -29,5 +29,7 @@ Route::post('/reset', [AuthController::class, 'resetPassword']);
 Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::get('/renew', [AuthController::class, 'renew']);
+
     Route::get('/users', [UserController::class, 'index']);
+    Route::put('/user/{id}', [UserController::class, 'update']);
 });
