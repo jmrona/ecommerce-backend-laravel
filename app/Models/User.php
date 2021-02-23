@@ -12,6 +12,12 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
 
+    const USER_BANNED = '1';
+    const USER_NOBANNED = '0';
+
+    const ROLE_ADMIN = 1;
+    const ROLE_CUSTOMER = 0;
+
     /**
          * The table associated with the model.
          *
@@ -50,4 +56,5 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
 }

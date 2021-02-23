@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\Config;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class UserController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('isAdmin');
+        $this->middleware('userStatus');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -135,8 +140,8 @@ class UserController extends Controller
 
         if( $user->avatar === null){
             return response()->json([
-                'status' => 200,
-                'ok' => true,
+                'status' => 400,
+                'ok' => false,
                 'msg' => 'Avatar no found',
                 'user' => $user
             ]);
@@ -152,13 +157,72 @@ class UserController extends Controller
                 ]);
             }else{
                 return response()->json([
-                    'status' => 200,
-                    'ok' => true,
+                    'status' => 400,
+                    'ok' => false,
                     'msg' => 'Something was wrong! Please, contact to the admin'
                 ]);
             }
         }
+    }
 
+    public function setBanUser($id){
+        $user = User::where('id', $id)->where('status', '0')->first();
+        if(!$user){
+            return response()->json([
+                'status' => 400,
+                'ok' => false,
+                'msg' => 'The user doesn\'t exist or is already banned'
+            ]);
+        }
+
+        $user->status = User::USER_BANNED;
+
+        if(!$user->save()){
+            return response()->json([
+                'status' => 400,
+                'ok' => false,
+                'msg' => 'Something was wrong! Please, contact to the admin'
+            ]);
+        }
+
+        $userList = User::orderBy('name', 'Asc')->get();
+
+        return response()->json([
+            'status' => 200,
+            'ok' => true,
+            'msg' => 'User banned successfully',
+            'users' => $userList
+        ]);
+    }
+
+    public function removeBanUser($id){
+        $user = User::where('id', $id)->where('status', '1')->first();
+        if(!$user){
+            return response()->json([
+                'status' => 400,
+                'ok' => false,
+                'msg' => 'The user doesn\'t exist or is already banned'
+            ]);
+        }
+
+        $user->status = User::USER_NOBANNED;
+
+        if(!$user->save()){
+            return response()->json([
+                'status' => 400,
+                'ok' => false,
+                'msg' => 'Something was wrong! Please, contact to the admin'
+            ]);
+        }
+
+        $userList = User::orderBy('name', 'Asc')->get();
+
+        return response()->json([
+            'status' => 200,
+            'ok' => true,
+            'msg' => 'User unbanned successfully',
+            'users' => $userList
+        ]);
     }
 
     /**

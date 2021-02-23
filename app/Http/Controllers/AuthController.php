@@ -69,6 +69,14 @@ class AuthController extends Controller
 
         $user = User::where('email',$request->email)->first();
 
+        if($user->status === 1){
+            return response()->json([
+                'status' => 500,
+                'ok' => false,
+                'msg' => 'Access denied'
+            ]);
+        }
+
         $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
@@ -90,16 +98,29 @@ class AuthController extends Controller
     }
 
     public function renew( Request $request ){
+        if(Auth::user()->status === 1){
+            return response()->json([
+                'status' => 500,
+                'ok' => false,
+                'msg' => 'Access denied'
+            ]);
+        }
+
         if(Auth::check()){
             $request->user()->tokens()->delete();
             $newToken = $request->user()->createToken('authToken')->plainTextToken;
+
+            $user = User::where('id', Auth::user()->id)->first();
+            $user->last_connection = date('Y-m-d H:i:s');
+            $user->save();
 
             return response()->json([
                 'status' => 200,
                 'ok' => true,
                 'msg'=> 'Token updated successfully',
                 'user' => $request->user(),
-                'token' => $newToken
+                'token' => $newToken,
+                'clg' => $user
             ]);
         }
 
