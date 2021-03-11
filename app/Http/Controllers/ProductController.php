@@ -105,6 +105,7 @@ class ProductController extends Controller
         $product->name = e($request->name);
         $product->description = e($request->description);
         $product->price = $request->price;
+        $product->category_id = $request->category;
         $product->status = $request->status ?? 0;
         $product->category_id = $category->id;
 
@@ -129,7 +130,7 @@ class ProductController extends Controller
                 // localhost:8000/storage/img/products/$id/$image
 
                 $file_ext = trim($file->getClientOriginalExtension());
-                if($file_ext !== 'png' || $file_ext !== 'jpg' || $file_ext !== 'jpeg'){
+                if($file_ext !== 'png' && $file_ext !== 'jpg' && $file_ext !== 'jpeg'){
                     return response()->json([
                         'status' => 400,
                         'ok' => false,
@@ -180,19 +181,10 @@ class ProductController extends Controller
             ]);
         }
 
-        $pictures_pending = count($request->file('files'));
-        $pictures_uploaded = count($product_updated->getPictures);
-        if( $pictures_pending + $pictures_uploaded > 5){
-            return response()->json([
-                'status' => 400,
-                'ok' => false,
-                'msg' => 'You cannot upload more than 5 pictures'
-            ]);
-        }
-
         $product_updated->name = $request->name;
         $product_updated->description = $request->description;
         $product_updated->price = $request->price;
+        $product_updated->category_id = $request->category;
         $product_updated->status = $request->status ?? 0;
 
         if(!$request->in_discount){
@@ -212,6 +204,16 @@ class ProductController extends Controller
         }
 
         if($request->hasFile('files')){
+            $pictures_pending = count($request->file('files'));
+            $pictures_uploaded = count($product_updated->getPictures);
+            if( $pictures_pending + $pictures_uploaded > 5){
+                return response()->json([
+                    'status' => 400,
+                    'ok' => false,
+                    'msg' => 'You cannot upload more than 5 pictures'
+                ]);
+            }
+
             foreach($request->file('files') as $value) {
                 $file = $value;
                 $dir = '/'.$product_updated->id;
@@ -219,7 +221,7 @@ class ProductController extends Controller
                 // localhost:8000/storage/img/products/$id/$image
 
                 $file_ext = trim($file->getClientOriginalExtension());
-                if($file_ext !== 'png' || $file_ext !== 'jpg' || $file_ext !== 'jpeg'){
+                if($file_ext !== 'png' && $file_ext !== 'jpg' && $file_ext !== 'jpeg'){
                     return response()->json([
                         'status' => 400,
                         'ok' => false,
