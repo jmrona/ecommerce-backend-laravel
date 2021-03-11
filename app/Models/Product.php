@@ -14,6 +14,10 @@ class Product extends Model
          * The table associated with the model.
          *
          * @var string
-         */
-        protected $table = 'products';
+    */
+    protected $table = 'products';
+
+    public function getPictures(){
+        return $this->hasMany(ProductGallery::class);
+    }
 }

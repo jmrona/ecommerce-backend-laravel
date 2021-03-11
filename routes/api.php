@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductGalleryController;
 use App\Http\Controllers\UserController;
 
 // Token no required
@@ -29,8 +30,11 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     // Products
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/product/{id}', [ProductController::class, 'update']);
+    Route::post('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
+
+    // ProductGallery
+    Route::delete('/picture/{id}', [ProductGalleryController::class, 'deletePicture']);
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
